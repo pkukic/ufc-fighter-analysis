@@ -33,7 +33,7 @@ dim(all)
 
 ## Zadatak 1: Možemo li očekivati završetak borbe knockout-om ovisno o razlici u dužini ruku između boraca?
 
-Početni korak u rješavanju ovog zadatka bila je pretvorba težine, visine i dosega iz imperijalnog sustava oba borca u metrički sustav. Ovdje je prikazana jedna pretvorba, na isti način su napravljene i ostalih 5 pretvorbi.
+Početni korak u rješavanju ovog zadatka bila je pretvorba težine, visine i dosega oba borca iz imperijalnog sustava  u metrički sustav. Ovdje je prikazana jedna pretvorba, na isti način su napravljene i ostalih 5 pretvorbi.
 Ignorirali smo sve datapoint-ove sa NA vrijednostima.
 
 ```{r}
@@ -282,7 +282,7 @@ hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_wei
 Iz prikazanih histograma uočavamo da su vremena trajanja borbi sukladna formatima borbi (većina borbi završava u 15. minuti jer su formata 5+5+5 minuta).  
 
 
-Kako bi proveli Kruskal-Wallisov test moramo imati minimalno 5 opservacija u svakoj od kategorija.
+Kako bi proveli Kruskal-Wallisov test moramo imati minimalno 5 opservacija u svakoj od kategorija, što možemo i potvrditi iz sljedeće tablice:
 
 ```{r}
 table(all_without_unknown_weight_classes$weight_class)
@@ -335,9 +335,9 @@ lillie.test(title_bouts_last_round)
 
 
 Iz histograma i Lillieforsovog testa vidimo da podaci nisu normalno distribuirani te stoga primjenjujemo neparametarsku verziju t-testa, Wilcoxonov signed rank test.
-Postavaljamo hipoteze:
-*   H0: Borbe za titulu ne traju duže (u rundama) od ostalih borbi u natjecanju.
-*   H1: Borbe za titulu traju duže (u rundama) od ostalih borbi u natjecanju.
+Postavljamo hipoteze:
+-   H0: Borbe za titulu ne traju duže (u rundama) od ostalih borbi u natjecanju.
+-   H1: Borbe za titulu traju duže (u rundama) od ostalih borbi u natjecanju.
 
 ```{r}
 wilcox.test(title_bouts_last_round, non_title_bouts_last_round, alternative='greater', conf.level=0.9)
@@ -547,7 +547,7 @@ Na razini značajnosti $\alpha=0.1$ možemo odbaciti H0 u korist H1 (postotak po
 # wilcox.test(male_ko_winners_without_outliers, female_ko_winners_without_outliers, alternative='greater', conf.level = 0.9)
 ```
 
-## Dodatni zadatak 3. - Razlikuje li se broj pobjeda i pobjeda putem knockout-a ovisno o stavu borca (stance)?
+## Dodatni zadatak 3. - Razlikuje li se broj pobjeda i pobjeda putem nokauta ovisno o stavu borca (stance)?
 
 ```{r}
 # Odredivanje broja pobjeda i broja pobjeda putem knockout-a za borce
