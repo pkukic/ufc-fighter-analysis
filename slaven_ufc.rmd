@@ -24,7 +24,8 @@ dim(fighter_details)
 ```
 ```{r}
 all <- merge(total_fight_data, fighter_details, by.x='R_fighter', by.y='fighter_name', all.x = TRUE)
-all <- merge(all, fighter_details, by.x='B_fighter', by.y='fighter_name', all.x = TRUE, suffixes = c('.r','.b'))
+all <- merge(all, fighter_details, by.x='B_fighter', by.y='fighter_name', 
+             all.x = TRUE, suffixes = c('.r','.b'))
 ```
 ```{r}
 dim(all)
@@ -111,8 +112,9 @@ qqline(d, col='blue', lwd=2)
 ```
 
 Iz histograma i Q-Q plota, možemo zaključiti da su podaci normalno distribuirani, te primjenjujemo t-test.
-  - H0: Razlika u dosegu između pobjednika i gubitnika jednaka je nuli.
-  - H1: Pobjednici imaju veći doseg od gubitnika.
+
+*   H0: Razlika u dosegu između pobjednika i gubitnika jednaka je nuli.
+*   H1: Pobjednici imaju veći doseg od gubitnika.
 
 ```{r}
 t.test(d, alternative='greater', mu=0, conf.level=0.95)
@@ -183,8 +185,11 @@ all$Fight_duration_s <- dur
 
 ```{r}
 # Grupiranje po kategorijama (odvojeno po spolu)
-men_classes = c('Light Heavyweight',  'Open Weight', 'Lightweight', 'Heavyweight', 'Featherweight', 'Bantamweight', 'Welterweight', 'Middleweight', 'Flyweight')
-women_classes = c("Women's Bantamweight", "Women's Strawweight", "Women's Featherweight", "Women's Flyweight")
+men_classes = c('Light Heavyweight',  'Open Weight', 'Lightweight', 'Heavyweight', 
+                'Featherweight', 'Bantamweight', 'Welterweight', 'Middleweight', 
+                'Flyweight')
+women_classes = c("Women's Bantamweight", "Women's Strawweight", 
+                  "Women's Featherweight", "Women's Flyweight")
 
 # Funkcija za string s vraća TRUE ako sadrži neku od prije navedenih klasa (men_classes, women_classes)
 filter_not_in_classes <- function(s){
@@ -234,15 +239,16 @@ Pojedine kategorije ne sadržavaju informaciju o spolu i težini te ih stoga ne 
 all_without_unknown_weight_classes = subset(all, !(Fight_type %in% ignore_fight_types))
 ```
 
-Pretpostavke parametarske ANOVA metode su: 
-  1. nezavisnost pojedinih podataka u uzorcima
-  2. normalna razdioba podataka
-  3. homogenost varijanci među populacijama
+Pretpostavke parametarske ANOVA metode su:
+
+*   nezavisnost pojedinih podataka u uzorcima
+*   normalna razdioba podataka
+*   homogenost varijanci među populacijama
 
 1) Pretpostavljamo nezavisnost podataka u uzorcima, jer su borbe međusobno nezavisne.
 2) Nastavaljamo sa testiranjem normalnosti razdiobe podataka. Koristimo Lillieforsov test normalnosti.
- - H0: Podaci pripadaju normalnoj razdiobi.
- - H1: Podaci ne pripadaju normalnoj razdiobi.
+*   H0: Podaci pripadaju normalnoj razdiobi.
+*   H1: Podaci ne pripadaju normalnoj razdiobi.
 3) Ako razdioba podataka nije normalna, nema smisla provjeravati homoskedastičnost. U drugom slučaju, homoskedastičnost moramo provjeriti Bartlettovim testom.
 
 ```{r, echo=FALSE}
@@ -254,8 +260,10 @@ for (i in 1:nrow(all_without_unknown_weight_classes)) {
 all_without_unknown_weight_classes$weight_class = weight_class
 ```
 
-```{r}
+```{r, echo=FALSE}
 require(nortest)
+```
+```{r}
 lillie.test(all_without_unknown_weight_classes$Fight_duration_s[weight_class == "Open Weight"])
 ```
 
@@ -263,9 +271,12 @@ Zbog vrlo male $p$ vrijednosti odbacujemo H0 u korist H1 i zaključujemo da poda
 
 ```{r}
 # weight_classes = c(men_classes, women_classes)
-hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Open Weight"], xlab="Fight duration [s]", main="Open Weight")
-hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Heavyweight"], xlab="Fight duration [s]", main="Heavyweight")
-hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Women's Flyweight"], xlab="Fight duration [s]", main="Women's Flyweight")
+hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Open Weight"], 
+     xlab="Fight duration [s]", main="Open Weight")
+hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Heavyweight"], 
+     xlab="Fight duration [s]", main="Heavyweight")
+hist(all_without_unknown_weight_classes$Fight_duration_s[all_without_unknown_weight_classes$weight_class == "Women's Flyweight"], 
+     xlab="Fight duration [s]", main="Women's Flyweight")
 
 ```
 Iz prikazanih histograma uočavamo da su vremena trajanja borbi sukladna formatima borbi (većina borbi završava u 15. minuti jer su formata 5+5+5 minuta).  
@@ -278,8 +289,9 @@ table(all_without_unknown_weight_classes$weight_class)
 ```
 
 Postavaljamo hipoteze:
- - H0: Trajanje borbi se ne razlikuje između kategorija.
- - H1: Trajanje borbi se razlikuje između barem dvije kategorije.
+
+*   H0: Trajanje borbi se ne razlikuje između kategorija.
+*   H1: Trajanje borbi se razlikuje između barem dvije kategorije.
  
 ```{r}
 kruskal.test(Fight_duration_s~weight_class, data=all_without_unknown_weight_classes)
@@ -310,8 +322,10 @@ non_title_bouts_last_round = all[!title_bout_vector,]$last_round
 ```
 
 ```{r}
-hist(title_bouts_last_round, breaks=seq(min(title_bouts_last_round)-0.5, max(title_bouts_last_round)+0.5, by=1), main="Freq. of number of rounds for title bouts", xlab="No. of rounds")
-hist(non_title_bouts_last_round, breaks=seq(min(non_title_bouts_last_round)-0.5, max(non_title_bouts_last_round)+0.5, by=1),  main="Freq. of number of rounds for non title bouts", xlab="No. of rounds")
+hist(title_bouts_last_round, breaks=seq(min(title_bouts_last_round)-0.5, max(title_bouts_last_round)+0.5, by=1), 
+     main="Freq. of number of rounds for title bouts", xlab="No. of rounds")
+hist(non_title_bouts_last_round, breaks=seq(min(non_title_bouts_last_round)-0.5, max(non_title_bouts_last_round)+0.5, by=1), 
+     main="Freq. of number of rounds for non title bouts", xlab="No. of rounds")
 ```
 
 ```{r}
@@ -322,8 +336,8 @@ lillie.test(title_bouts_last_round)
 
 Iz histograma i Lillieforsovog testa vidimo da podaci nisu normalno distribuirani te stoga primjenjujemo neparametarsku verziju t-testa, Wilcoxonov signed rank test.
 Postavaljamo hipoteze:
-  - H0: Borbe za titulu ne traju duže (u rundama) od ostalih borbi u natjecanju.
-  - H1: Borbe za titulu traju duže (u rundama) od ostalih borbi u natjecanju.
+*   H0: Borbe za titulu ne traju duže (u rundama) od ostalih borbi u natjecanju.
+*   H1: Borbe za titulu traju duže (u rundama) od ostalih borbi u natjecanju.
 
 ```{r}
 wilcox.test(title_bouts_last_round, non_title_bouts_last_round, alternative='greater', conf.level=0.9)
@@ -446,16 +460,19 @@ fighter_details$win_rate_by_submission = win_rate_by_submission
 
 ```{r}
 # Vektor postotaka pobjede putem submissiona za niske borce
-short_winners = subset(fighter_details, height_category=='short' & !is.na(win_rate_by_submission))$win_rate_by_submission
+short_winners = subset(fighter_details, height_category=='short' &
+                         !is.na(win_rate_by_submission))$win_rate_by_submission
 # Vektori postotaka pobjede putem submissiona za visoke borce
-tall_winners = subset(fighter_details, height_category=='tall' & !is.na(win_rate_by_submission))$win_rate_by_submission
+tall_winners = subset(fighter_details, height_category=='tall' & 
+                        !is.na(win_rate_by_submission))$win_rate_by_submission
 
 hist(short_winners, main="Freq. of short fighters submission win rate", xlab="Win rate by submission")
 hist(tall_winners, main="Freq. of tall fighters submission win rate", xlab="Win rate by submission")
 ```
 Postavljamo sljedeće hipoteze:
-- H0: Postotci pobjeda putem submissiona jednaki su za visoke i niske borce.
-- H1: Postotci pobjeda putem submissiona manji su za visoke borce.
+
+*   H0: Postotci pobjeda putem submissiona jednaki su za visoke i niske borce.
+*   H1: Postotci pobjeda putem submissiona manji su za visoke borce.
 
 Razinu značajnosti $\alpha$ postavljamo na 0.1 zbog toga što želimo biti manje osjetljivi na ne odbacivanje H0.
 
@@ -466,11 +483,11 @@ wilcox.test(tall_winners, short_winners, alternative='less', conf.level=0.9)
 Na razini značajnosti $\alpha=0.1$ i dobivene $p$ vrijednosti iz Wilcoxonovog testa sume rangova zaključujemo da ne možemo odbaciti H0 u korist H1 (ne možemo odbaciti hipotezu da su postotci pobjeda putem submissiona jednaki za visoke i niske borce).
 
 ```{r, echo=FALSE}
-short_winners_without_outliers = short_winners[short_winners != 0 & short_winners != 1]
-tall_winners_without_outliers = tall_winners[tall_winners != 0 & tall_winners != 1]
-hist(short_winners_without_outliers)
-hist(tall_winners_without_outliers)
-wilcox.test(tall_winners_without_outliers, short_winners_without_outliers, alternative='less', conf.level=0.9)
+# short_winners_without_outliers = short_winners[short_winners != 0 & short_winners != 1]
+# tall_winners_without_outliers = tall_winners[tall_winners != 0 & tall_winners != 1]
+# hist(short_winners_without_outliers)
+# hist(tall_winners_without_outliers)
+# wilcox.test(tall_winners_without_outliers, short_winners_without_outliers, alternative='less', conf.level=0.9)
 ```
 
 ## Dodatni zadatak 2. - Završavaju li muške borbe češće nokautom?
@@ -507,8 +524,9 @@ hist(female_ko_winners, main="Freq. of female fighters knockout win rate", xlab=
 hist(male_ko_winners, main="Freq. of male fighters knockout win rate", xlab="Win rate by knockout")
 ```
 Postavljamo hipoteze:
-- H0: Postotci pobjeda putem nokauta jednaki su za muškarce i žene.
-- H1: Postotci pobjeda putem nokauta veći su za muškarce.
+
+*   H0: Postotci pobjeda putem nokauta jednaki su za muškarce i žene.
+*   H1: Postotci pobjeda putem nokauta veći su za muškarce.
 
 Razinu značajnosti $\alpha$ postavljamo na 0.1 kao i u prethodnim testovima.
 
@@ -519,14 +537,14 @@ wilcox.test(male_ko_winners, female_ko_winners, alternative='greater', conf.leve
 Na razini značajnosti $\alpha=0.1$ možemo odbaciti H0 u korist H1 (postotak pobjeda putem nokauta veći je za muškarce).
 
 ```{r, echo=FALSE}
-male_ko_winners_without_outliers = male_ko_winners[male_ko_winners != 0 & male_ko_winners != 1]
-female_ko_winners_without_outliers = female_ko_winners[female_ko_winners != 0 & female_ko_winners != 1]
-
-hist(male_ko_winners_without_outliers)
-hist(female_ko_winners_without_outliers)
-
-wilcox.test(male_ko_winners_without_outliers, female_ko_winners_without_outliers, alternative='less', conf.level = 0.9)
-wilcox.test(male_ko_winners_without_outliers, female_ko_winners_without_outliers, alternative='greater', conf.level = 0.9)
+# male_ko_winners_without_outliers = male_ko_winners[male_ko_winners != 0 & male_ko_winners != 1]
+# female_ko_winners_without_outliers = female_ko_winners[female_ko_winners != 0 & female_ko_winners != 1]
+# 
+# hist(male_ko_winners_without_outliers)
+# hist(female_ko_winners_without_outliers)
+# 
+# wilcox.test(male_ko_winners_without_outliers, female_ko_winners_without_outliers, alternative='less', conf.level = 0.9)
+# wilcox.test(male_ko_winners_without_outliers, female_ko_winners_without_outliers, alternative='greater', conf.level = 0.9)
 ```
 
 ## Dodatni zadatak 3. - Razlikuje li se broj pobjeda i pobjeda putem knockout-a ovisno o stavu borca (stance)?
@@ -577,8 +595,9 @@ stance_table = select(stance_table, -Stance)
 
 Očekivane frekvencije su veće od 5 u svakoj ćeliji tablice. Stoga smijemo primjeniti test homogenosti.
 Postavljamo hipoteze:
-- H0: Postotak pobjeda putem nokauta jednak je za svaku od kategorija boraca prema stavu (ljevaci, dešnjaci i ambidekstri).
-- H1: Postotak pobjeda putem nokauta nije jednak za barem dvije od kategorija boraca prema stavu (ljevaci, dešnjaci i ambidekstri).
+
+*   H0: Postotak pobjeda putem nokauta jednak je za svaku od kategorija boraca prema stavu (ljevaci, dešnjaci i ambidekstri).
+*   H1: Postotak pobjeda putem nokauta nije jednak za barem dvije od kategorija boraca prema stavu (ljevaci, dešnjaci i ambidekstri).
 
 Za chisq.test nije dostupan argument conf_level, tako da ne postavljamo nikakvu razinu značajnosti kao argument testa. Ipak, odabiremo razinu značajnosti $\alpha=0.05$.
 
@@ -589,7 +608,7 @@ chisq.test(stance_table, correct=FALSE)
 Na odabranoj razini značajnosti možemo odbaciti H0 u korist H1 (udio pobjeda putem KO i pobjeda drugim načinima nije isti za sve kategorije Stance).
 Iz tablice *stance_table* možemo naslutiti da borci koji su ambidekstri imaju veći udio pobjeda putem KO.
 
-## 4 zadatak - Možemo li iz zadanih obilježja predvidjeti pobjednika?
+## Zadatak 4: Možemo li iz zadanih obilježja predvidjeti pobjednika?
 
 Za svaku borbu smo izračunali dob oba borca (Red i Blue) na dan borbe.
 
@@ -691,7 +710,7 @@ logreg_data = subset(all_for_logreg, select=selected_columns)
 logreg_data = logreg_data %>% drop_na()
 ```
 
-
+Koristimo model logističke regresije jer je zavisna varijabla indikatorska.
 ```{r}
 require(caret)
 
@@ -736,13 +755,16 @@ recall
 specificity
 ```
 
-Zbog visokih vrijednosti izračunatih varijabli (točnost, preciznost, odziv i specifičnost) možemo zaključiti da je model kvalitetan.
+Zbog visokih vrijednosti izračunatih varijabli (točnost, preciznost, odziv i specifičnost) zaključujemo da je model kvalitetan.
 
-## Model bez linearno zavisnih ili neznačajnih regresora
+## Model bez linearno zavisnih i neznačajnih regresora
 
 ```{r}
 # Izbacivanje nesignifikantnih varijabli
-significant_variables = c("R_KD", "B_KD", "R_SUB_ATT", "B_SUB_ATT", "R_REV", "B_REV", "TD_Avg.r", "red_age", "r_sig_str", "b_sig_str", "r_total_str", "r_td", "b_td", "r_head", "b_head", "r_distance", "b_distance", "r_clinch", "b_clinch", "td_acc.b")
+significant_variables = c("R_KD", "B_KD", "R_SUB_ATT", "B_SUB_ATT", "R_REV", "B_REV", 
+                          "TD_Avg.r", "red_age", "r_sig_str", "b_sig_str", "r_total_str", 
+                          "r_td", "b_td", "r_head", "b_head", "r_distance", "b_distance",
+                          "r_clinch", "b_clinch", "td_acc.b")
 
 b <- paste(significant_variables, collapse=' + ')
 logreg_mdl_reduced = glm(as.formula(paste("red_is_winner ~ ", b)), data=logreg_data, family=binomial())
@@ -775,8 +797,9 @@ specificity
 
 Za usporedbu modela koristit ćemo ANOVA-u.
 Postavljamo hipoteze:
- - H0: Modeli su jednake kvalitete
- - H1: Originalni model je bolji od reduciranog
+
+*   H0: Modeli su jednake kvalitete
+*   H1: Originalni model je bolji od reduciranog
 
 ```{r}
 # Usporedba dva modela
@@ -785,18 +808,29 @@ anova(logreg_mdl, logreg_mdl_reduced, test='LRT')
 
 Sa razinom značajnosti $\alpha=0.05$ zaključujemo da možemo odbaciti H0 u korist H1 (originalni model bolji je od reduciranog).
 
-## Model sa apriornim podacima
+## Model s apriornim podacima
 
+Postavlja se zanimljivo pitanje možemo li samo na temelju značajki dostupnih prije borbe odrediti pobjednika (prijašnja statistika svakog borca).
+
+Odabiremo samo varijable dostupne prije borbe za svakog borca, te njih koristimo kao regresore u novom logističkom modelu.
 ```{r}
-fighter_details_variables = c("TD_Avg.r", "SLpM.r", "SApM.r", "Sub_Avg.r", "TD_Avg.b", "SLpM.b", "SApM.b", "Sub_Avg.b", "Height_cm.b", "Height_cm.r", "Reach_cm.b", "Reach_cm.r", "Weight_kg.b", "Weight_kg.r", "red_age", "blue_age", "str_def.r", "str_acc.r", "td_acc.r", "td_def.r", "str_def.b", "str_acc.b", "td_acc.b", "td_def.b", "red_is_winner", "is_b_southpaw", "is_b_orthodox", "is_r_southpaw", "is_r_orthodox")
+fighter_details_variables = c("TD_Avg.r", "SLpM.r", "SApM.r", "Sub_Avg.r", "TD_Avg.b", 
+                              "SLpM.b", "SApM.b", "Sub_Avg.b", "Height_cm.b", 
+                              "Height_cm.r", "Reach_cm.b", "Reach_cm.r", "Weight_kg.b", 
+                              "Weight_kg.r", "red_age", "blue_age", "str_def.r", "str_acc.r", 
+                              "td_acc.r", "td_def.r", "str_def.b", "str_acc.b", "td_acc.b", 
+                              "td_def.b", "red_is_winner", "is_b_southpaw", "is_b_orthodox", 
+                              "is_r_southpaw", "is_r_orthodox")
 logreg_fighters_data = subset(logreg_data, select = fighter_details_variables)
 fighter_details_variables = fighter_details_variables[fighter_details_variables != "red_is_winner"]
 
 b <- paste(fighter_details_variables, collapse=' + ')
-logreg_mdl_fighter_details = glm(as.formula(paste("red_is_winner ~ ", b)), data=logreg_fighters_data, family=binomial())
+logreg_mdl_fighter_details = glm(as.formula(paste("red_is_winner ~ ", b)), 
+                                 data=logreg_fighters_data, family=binomial())
 summary(logreg_mdl_fighter_details)
 ```
 
+Izračunavamo mjere kvalitete modela.
 ```{r}
 # Računanje Rsq
 Rsq = 1 - logreg_mdl_fighter_details$deviance/logreg_mdl_fighter_details$null.deviance
@@ -814,9 +848,9 @@ precision = tab[2,2]/sum(tab[,2])
 recall = tab[2,2]/sum(tab[2,])
 specificity = tab[1,1]/sum(tab[,1])
 
-sprintf("Accuracy: %.3f", accuracy)
-sprintf("Precision: %.3f", precision)
-sprintf("Recall: %.3f", recall)
-sprintf("Specificity: %.3f", specificity)
+accuracy
+precision
+recall
+specificity
 ```
-
+Iz izračunatih mjera kvalitete naslućujemo da je model lošiji od prijašnjih, ali također i da je bolji od običnog pogađanja.
