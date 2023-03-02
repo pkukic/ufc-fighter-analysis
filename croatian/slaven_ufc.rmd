@@ -13,13 +13,13 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 
 ## Početna analiza podataka
 ```{r}
-total_fight_data = read.csv('total_fight_data.csv', sep=';')
+total_fight_data = read.csv('../total_fight_data.csv', sep=';')
 dim(total_fight_data)
 
 ```
 
 ```{r}
-fighter_details = read.csv('fighter_details.csv', sep=',')
+fighter_details = read.csv('../fighter_details.csv', sep=',')
 dim(fighter_details)
 ```
 ```{r}
